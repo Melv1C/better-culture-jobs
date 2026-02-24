@@ -5,6 +5,7 @@ import { useAuth } from '@/middlewares/use-auth';
 import { useLogger } from '@/middlewares/use-logger';
 import { Hono } from 'hono';
 import { healthRoutes } from './health';
+import { jobsRoutes } from './jobs';
 import { logsRoutes } from './logs';
 
 export const routes = new Hono()
@@ -25,6 +26,7 @@ export const routes = new Hono()
   //////////////////////////////////////////////////
   // Add routes with logging middleware applied here
 
+  .route('/jobs', jobsRoutes)
   //////////////////////////////////////////////////
   // Global error handler
   .onError((err, c) => {
