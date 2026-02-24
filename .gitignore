@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.production
+
+# Build outputs
+build/
+dist/
+out/
+web-build/
+
+# Testing
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+
+# IDE and Editor
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+*.pem
+
+# Turbo
+.turbo/
+
+# Generated files
+generated/
+
+# Vite
+.vite/
+
+# Expo
+.expo/
+expo-env.d.ts

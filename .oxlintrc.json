@@ -1,0 +1,9 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "ignorePatterns": ["**/node_modules/**", "**/dist/**", "**/generated/**", "**/routeTree.gen.ts"],
+  "rules": {
+    "typescript/no-explicit-any": "error",
+    "typescript/no-floating-promises": "allow", // TODO: Enable this rule and fix all issues
+    "typescript/restrict-template-expressions": "allow" // TODO: Enable this rule and fix all issues
+  }
+}

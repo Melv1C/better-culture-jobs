@@ -1,0 +1,52 @@
+{
+  "name": "backend",
+  "version": "0.0.0",
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "types": "./src/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.mts",
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "dev": "concurrently \"tsdown --watch\" \"tsx watch src/index.ts\"",
+    "build": "tsdown",
+    "start": "npm run prisma:migrate:deploy && node ./dist/index.mjs",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:migrate:deploy": "prisma migrate deploy",
+    "prisma:validate": "prisma validate",
+    "prisma:format": "prisma format",
+    "add-admin": "tsx scripts/add-admin.ts",
+    "sync-json-data": "tsx scripts/sync-json-data.ts"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.19.9",
+    "@hono/zod-validator": "^0.7.6",
+    "@prisma/adapter-pg": "^7.4.1",
+    "@prisma/client": "^7.4.1",
+    "@prisma/studio-core": "^0.14.0",
+    "@repo/utils": "workspace:*",
+    "better-auth": "^1.4.19",
+    "dotenv": "^17.3.1",
+    "hono": "^4.12.2",
+    "pg": "^8.18.0",
+    "socket.io": "^4.8.3",
+    "winston": "^3.19.0",
+    "winston-transport": "^4.9.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^25.3.0",
+    "@types/pg": "^8.16.0",
+    "concurrently": "^9.2.1",
+    "prisma": "^7.4.1",
+    "tsdown": "^0.20.3",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
