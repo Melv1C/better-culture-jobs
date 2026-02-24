@@ -1,4 +1,15 @@
-import { Alert, AlertDescription, AlertTitle, Badge, Button, Card, CardContent, CardHeader, CardTitle, Skeleton } from '@melv1c/ui-core';
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Skeleton,
+} from '@melv1c/ui-core';
 import { useState } from 'react';
 import { useCultureJobs } from '../hooks/use-culture-jobs';
 
@@ -47,7 +58,9 @@ export function JobsBoard() {
         <h1 className="text-3xl font-bold">Offres d&apos;emploi Culture.be</h1>
         <Alert variant="destructive">
           <AlertTitle>Impossible de charger les offres</AlertTitle>
-          <AlertDescription>{error instanceof Error ? error.message : 'Erreur inconnue.'}</AlertDescription>
+          <AlertDescription>
+            {error instanceof Error ? error.message : 'Erreur inconnue.'}
+          </AlertDescription>
         </Alert>
         <div>
           <Button onClick={() => refetch()}>Réessayer</Button>

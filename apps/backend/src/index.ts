@@ -10,7 +10,7 @@ import type { Server as HTTPServer } from 'node:http';
 const app = new Hono()
   .use(
     cors({
-      origin: [env.FRONTEND_URL, env.ADMIN_URL,],
+      origin: [env.FRONTEND_URL, env.ADMIN_URL],
       credentials: true,
     }),
   )
