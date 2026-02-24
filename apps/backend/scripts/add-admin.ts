@@ -12,8 +12,8 @@ function parseArgs(): AdminParams {
   const args = process.argv.slice(2);
 
   if (args.length !== 3) {
-    console.error('Usage: tsx scripts/add-admin.ts <name> <email> <password>');
-    console.error('Example: tsx scripts/add-admin.ts "Admin User" admin@example.com mypassword123');
+    console.error('Usage: pnpm run add-admin <name> <email> <password>');
+    console.error('Example: pnpm run add-admin "Admin User" admin@example.com mypassword123');
     process.exit(1);
   }
 
