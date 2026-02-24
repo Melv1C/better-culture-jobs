@@ -5,7 +5,7 @@ echo "🚀 Starting release process..."
 echo
 
 echo "📦 Running changeset version..."
-npx changeset version
+pnpm dlx @changesets/cli version
 
 sleep 1
 
@@ -18,7 +18,7 @@ git push --quiet
 echo
 
 echo "🏷️  Creating release tags..."
-npx changeset tag
+pnpm dlx @changesets/cli tag
 echo
 
 echo "📤 Pushing new tags one by one..."
