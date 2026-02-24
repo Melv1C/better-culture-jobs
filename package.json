@@ -1,5 +1,5 @@
 {
-  "name": "fullstack-turbo-kit",
+  "name": "better-culture-jobs",
   "version": "0.0.0",
   "scripts": {
     "build": "turbo run build",

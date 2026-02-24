@@ -1,6 +1,6 @@
-# Fullstack Turbo Kit
+# Better Culture Jobs
 
-A production-ready [Turborepo](https://turbo.build/repo) monorepo starter with full-stack applications and shared packages.
+A full-stack job board application built with a monorepo architecture using [Turborepo](https://turbo.build/). This project includes a backend API server, a frontend application for job seekers, and an admin panel for managing job listings.
 
 ## What's Inside?
 
