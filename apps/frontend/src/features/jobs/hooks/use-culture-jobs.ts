@@ -5,15 +5,11 @@ import { useQuery } from '@tanstack/react-query';
 const JOBS_STALE_TIME = 30000;
 const JOBS_CACHE_TIME = 5 * 60 * 1000;
 
-export function useCultureJobs(page: number) {
+export function useCultureJobs() {
   return useQuery({
-    queryKey: ['culture-jobs', page],
+    queryKey: ['culture-jobs'],
     queryFn: async (): Promise<CultureBeJobsResponse> => {
-      const res = await apiClient.api.jobs.$get({
-        query: {
-          page: String(page),
-        },
-      });
+      const res = await apiClient.api.jobs.$get();
 
       if (!res.ok) {
         const errorText = await res.text();

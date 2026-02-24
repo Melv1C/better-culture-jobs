@@ -17,7 +17,7 @@
     "dev": "tsdown --watch --no-clean"
   },
   "dependencies": {
-    "@melv1c/ui-core": "^1.1.2",
+    "@melv1c/ui-core": "^1.1.3",
     "lucide-react": "^0.575.0"
   },
   "devDependencies": {

@@ -1,9 +1,9 @@
-import { zValidator } from '@hono/zod-validator';
+import { getCachedValue, setCachedValue } from '@/lib/redis';
 import {
   CultureBeJob$,
-  CultureBeJobsQuery$,
   CultureBeJobsResponse$,
   type CultureBeJob,
+  type CultureBeJobsResponse,
 } from '@repo/utils';
 import * as cheerio from 'cheerio';
 import { Hono } from 'hono';
@@ -12,6 +12,12 @@ const CULTURE_BE_ORIGIN = 'https://www.culture.be';
 const CULTURE_BE_JOBS_PATH = '/vous-cherchez/emploi-stage/';
 const CULTURE_BE_PAGE_PARAM = 'cfwb_form[cfwb_form.list_offre_emploi][page]';
 const REQUEST_TIMEOUT_MS = 15000;
+const CACHE_TTL_SECONDS = 300;
+const ALL_JOBS_CACHE_KEY = 'culture-be:jobs:all-pages';
+const REQUEST_HEADERS = {
+  'accept-language': 'fr-FR,fr;q=0.9,en;q=0.8',
+  'user-agent': 'Mozilla/5.0 (compatible; better-culture-jobs/1.0)',
+};
 
 function normalizeText(value: string | undefined): string {
   return (value ?? '').replace(/\s+/g, ' ').trim();
@@ -97,65 +103,86 @@ function parseJobs($: cheerio.CheerioAPI): CultureBeJob[] {
   return jobs;
 }
 
-export const jobsRoutes = new Hono().get('/', zValidator('query', CultureBeJobsQuery$), async c => {
-  c.get('logStep')?.info('Received request for culture.be jobs', {
-    query: c.req.valid('query'),
-  });
-  const { page } = c.req.valid('query');
+async function fetchJobsPage(page: number): Promise<{
+  jobs: CultureBeJob[];
+  totalPages: number;
+  jobsUrl: string;
+}> {
   const jobsUrl = buildCultureBeJobsUrl(page);
-
-  // TODO: add short-lived in-memory cache (TTL) for upstream scraper responses.
   const abortController = new AbortController();
   const timeoutId = setTimeout(() => {
     abortController.abort();
   }, REQUEST_TIMEOUT_MS);
 
   try {
-    c.get('logStep')?.info('Fetching culture.be jobs', {
-      url: jobsUrl,
-    });
     const response = await fetch(jobsUrl, {
-      headers: {
-        'accept-language': 'fr-FR,fr;q=0.9,en;q=0.8',
-        'user-agent': 'Mozilla/5.0 (compatible; better-culture-jobs/1.0)',
-      },
+      headers: REQUEST_HEADERS,
       signal: abortController.signal,
     });
 
     if (!response.ok) {
-      c.get('logStep')?.error('culture.be upstream returned non-OK status', {
-        status: response.status,
-      });
       throw new Error(`culture.be upstream returned ${response.status}`);
     }
 
-    c.get('logStep')?.info('Received response from culture.be', {
-      status: response.status,
-    });
-
     const html = await response.text();
-    c.get('logStep')?.info('Parsing culture.be response HTML', {
-      length: html.length,
-    });
     const $ = cheerio.load(html);
 
-    const data = parseJobs($);
-    const totalPages = parseTotalPages($);
-    const safeTotalPages = Math.max(totalPages, page);
+    return {
+      jobs: parseJobs($),
+      totalPages: parseTotalPages($),
+      jobsUrl,
+    };
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
 
-    c.get('logStep')?.info('Parsed culture.be jobs and pagination', {
-      jobsCount: data.length,
-      totalPages,
+export const jobsRoutes = new Hono().get('/', async c => {
+  c.get('logStep')?.info('Received request for culture.be jobs');
+
+  const cachedResponse = await getCachedValue<CultureBeJobsResponse>(ALL_JOBS_CACHE_KEY);
+  if (cachedResponse) {
+    const parsedCachedResponse = CultureBeJobsResponse$.safeParse(cachedResponse);
+    if (parsedCachedResponse.success) {
+      c.get('logStep')?.info('Returning cached culture.be jobs response', {
+        cacheKey: ALL_JOBS_CACHE_KEY,
+      });
+      return c.json(parsedCachedResponse.data);
+    }
+  }
+
+  try {
+    c.get('logStep')?.info('Fetching first culture.be jobs page to resolve pagination');
+    const firstPageResult = await fetchJobsPage(1);
+    const safeTotalPages = Math.max(firstPageResult.totalPages, 1);
+    const remainingPages = Array.from(
+      { length: Math.max(safeTotalPages - 1, 0) },
+      (_, index) => index + 2,
+    );
+
+    c.get('logStep')?.info('Resolved culture.be pagination and first-page jobs', {
+      firstPageUrl: firstPageResult.jobsUrl,
+      totalPagesFromSource: safeTotalPages,
+      firstPageJobsCount: firstPageResult.jobs.length,
+    });
+
+    const remainingPageResults = await Promise.all(remainingPages.map(page => fetchJobsPage(page)));
+    const mergedJobs = [
+      ...firstPageResult.jobs,
+      ...remainingPageResults.flatMap(result => result.jobs),
+    ];
+    const dedupedJobs = Array.from(
+      new Map(mergedJobs.map(job => [`${job.id}:${job.link}`, job])).values(),
+    );
+
+    c.get('logStep')?.info('Merged culture.be jobs from all pages', {
+      sourcePagesFetched: safeTotalPages,
+      jobsBeforeDeduplication: mergedJobs.length,
+      jobsCount: dedupedJobs.length,
     });
 
     const parsedResponse = CultureBeJobsResponse$.parse({
-      data,
-      pagination: {
-        page,
-        totalPages: safeTotalPages,
-        hasPrev: page > 1,
-        hasNext: page < safeTotalPages,
-      },
+      data: dedupedJobs,
       source: 'culture.be',
       fetchedAt: new Date().toISOString(),
     });
@@ -164,14 +191,13 @@ export const jobsRoutes = new Hono().get('/', zValidator('query', CultureBeJobsQ
       response: parsedResponse,
     });
 
+    await setCachedValue(ALL_JOBS_CACHE_KEY, parsedResponse, CACHE_TTL_SECONDS);
+
     return c.json(parsedResponse);
   } catch (error) {
     c.get('logStep')?.error('Failed to fetch culture.be jobs', {
       error: error instanceof Error ? error.message : String(error),
-      page,
     });
     return c.json({ error: 'Failed to fetch job offers' }, 502);
-  } finally {
-    clearTimeout(timeoutId);
   }
 });

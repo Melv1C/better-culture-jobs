@@ -17,6 +17,20 @@ services:
     networks:
       - fullstack-network
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - fullstack-network
+
   backend:
     build:
       context: .
@@ -31,7 +45,13 @@ services:
       - FRONTEND_URL=http://localhost:8080
       - ADMIN_URL=http://localhost:5174
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+      - REDIS_URL=redis://redis:6379
       - BETTER_AUTH_SECRET=your_secret_key_here_of_at_least_32_characters
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - fullstack-network
     restart: unless-stopped
@@ -82,6 +102,7 @@ services:
 
 volumes:
   db-data:
+  redis-data:
 
 networks:
   fullstack-network:
