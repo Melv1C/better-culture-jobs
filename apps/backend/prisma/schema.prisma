@@ -38,6 +38,81 @@ enum LogType {
   REQUEST
 }
 
+model Job {
+  id Int @id @default(autoincrement())
+
+  uid    Int
+  source JobSource @default(CULTURE_BE)
+
+  sourceUrl  String
+  listingUrl String
+
+  title        String
+  organization String
+
+  publicationDate    DateTime
+  publicationDateRaw String
+  postingType        JobPostingType
+
+  contractTypes ContractType[] @default([])
+  contractLabel String?
+  location      String?
+
+  applicationDeadline    DateTime?
+  applicationDeadlineRaw String?
+
+  jobDescription          String?
+  requirements            String?
+  contractDetails         String?
+  regime                  String?
+  applicationInstructions String?
+  documentsRequired       String?
+  comments                String?
+
+  employerDescription String?
+  employerSectors     String?
+  contactDetails      String?
+  moreInfo            String?
+
+  rawDetails Json?
+
+  scrapedAt   DateTime @default(now())
+  lastUpdated DateTime @updatedAt
+
+  @@unique([source, uid])
+  @@index([source, publicationDate])
+  @@index([postingType])
+  @@index([applicationDeadline])
+  @@map("job")
+}
+
+enum JobSource {
+  CULTURE_BE
+}
+
+enum JobPostingType {
+  EMPLOI
+  STAGE
+  BENEVOLAT
+  AUTRE
+}
+
+enum ContractType {
+  CDD
+  CDI
+  AUTRE
+}
+
+model JobSyncState {
+  source JobSource @id
+
+  lastSyncedAt DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("job_sync_state")
+}
+
 model User {
   id            String    @id
   name          String

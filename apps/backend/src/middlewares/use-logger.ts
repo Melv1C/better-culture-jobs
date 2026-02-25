@@ -2,7 +2,7 @@ import { logger } from '@/lib/logger';
 import { levelPriority, type LogLevel, type LogStep } from '@repo/utils';
 import type { Context, Next } from 'hono';
 
-type StepLogger = {
+export type StepLogger = {
   debug: (message: LogStep['message'], metadata?: LogStep['metadata']) => void;
   info: (message: LogStep['message'], metadata?: LogStep['metadata']) => void;
   warn: (message: LogStep['message'], metadata?: LogStep['metadata']) => void;

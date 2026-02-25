@@ -9,6 +9,8 @@ class PostgresTransport extends Transport {
   override async log(info: LogCreate, callback: () => void) {
     setImmediate(callback);
 
+    console.log('Logging info', info);
+
     const { level, message, type, userId, metadata, method, path, statusCode, durationMs, steps } =
       LogCreate$.parse(info);
 
