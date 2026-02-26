@@ -27,7 +27,6 @@ import {
   Clock3Icon,
   ExternalLinkIcon,
   FilterXIcon,
-  MapPinIcon,
   RefreshCwIcon,
   SearchIcon,
 } from 'lucide-react';
@@ -186,12 +185,6 @@ function JobCard({ job }: { job: CultureBeJob }) {
           <CalendarIcon className="size-3 shrink-0" />
           <span>{job.date}</span>
         </div>
-        {job.location && (
-          <div className="flex items-start gap-1.5 text-xs text-muted-foreground">
-            <MapPinIcon className="mt-0.5 size-3 shrink-0" />
-            <span className="line-clamp-2">{job.location}</span>
-          </div>
-        )}
         {job.applicationDeadlineRaw && (
           <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
             <Clock3Icon className="size-3 shrink-0" />
