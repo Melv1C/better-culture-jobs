@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Better Culture Jobs">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f766e" />
+      <stop offset="100%" stop-color="#14b8a6" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.2" />
+    </filter>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#bg)" />
+  
+  <g filter="url(#shadow)">
+    <!-- Briefcase handle -->
+    <path d="M24 22V16C24 14.8954 24.8954 14 26 14H38C39.1046 14 40 14.8954 40 16V22" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    
+    <!-- Briefcase body -->
+    <rect x="12" y="22" width="40" height="28" rx="4" fill="#ffffff" />
+    
+    <!-- Checkmark -->
+    <path d="M24 36L29 41L40 30" stroke="#0f766e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+  </g>
+</svg>
