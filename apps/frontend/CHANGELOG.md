@@ -1,5 +1,11 @@
 # frontend
 
+## 2.1.0
+
+### Minor Changes
+
+- Remove loction from card and add favicon
+
 ## 2.0.0
 
 ### Major Changes
